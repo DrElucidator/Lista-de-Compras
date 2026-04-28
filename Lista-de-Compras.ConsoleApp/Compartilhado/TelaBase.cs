@@ -3,7 +3,7 @@ namespace ListaDeCompras.ConsoleApp.Compartilhado;
 public abstract class TelaBase : ITela
 {
     public string nomeEntidade = string.Empty;
-    private RepositorioBase repositorio;
+    protected RepositorioBase repositorio;
 
     protected TelaBase(string nomeEntidade, RepositorioBase repositorio)
     {

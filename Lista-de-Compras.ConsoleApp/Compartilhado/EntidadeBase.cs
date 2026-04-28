@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 
 namespace ListaDeCompras.ConsoleApp.Compartilhado;
 
-public abstract class EntidadeBase
+public abstract class EntidadeBase : object
 {
     public string Id { get; private set; } = string.Empty;
 
@@ -15,5 +15,5 @@ public abstract class EntidadeBase
     }
 
     public abstract string[] Validar();
-    public abstract void AtualizarRegistro(EntidadeBase entidadeAtualizada);
+    public abstract void AtualizarDados(EntidadeBase entidadeAtualizada);
 }

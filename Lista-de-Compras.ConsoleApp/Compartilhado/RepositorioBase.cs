@@ -1,74 +1,51 @@
+using System.Collections;
 namespace ListaDeCompras.ConsoleApp.Compartilhado;
 
 public abstract class RepositorioBase
 {
-    protected EntidadeBase?[] registros = new EntidadeBase[100];
+    protected ArrayList registros = new ArrayList();
 
     public void Cadastrar(EntidadeBase entidade)
     {
-        for (int i = 0; i < registros.Length; i++)
-        {
-            if (registros[i] == null)
-            {
-                registros[i] = entidade;
-                break;
-            }
-        }
+        registros.Add(entidade);
     }
 
-    public bool Editar(string idSelecionado, EntidadeBase entidade)
+    public bool Editar(string idSelecionado, EntidadeBase entidadeAtualizada)
     {
-        EntidadeBase? entidadeSelecionada = SelecionarPorId(idSelecionado);
+        EntidadeBase? registroSelecionado = SelecionarPorId(idSelecionado);
 
-        if (entidadeSelecionada == null)
+        if (registroSelecionado == null)
             return false;
 
-        entidadeSelecionada.AtualizarRegistro(entidade);
+        registroSelecionado.AtualizarDados(entidadeAtualizada);
 
         return true;
     }
 
     public bool Excluir(string idSelecionado)
     {
-        for (int i = 0; i < registros.Length; i++)
-        {
-            EntidadeBase? c = registros[i];
+        EntidadeBase? registroSelecionado = SelecionarPorId(idSelecionado);
 
-            if (c == null)
-                continue;
+        if (registroSelecionado == null)
+            return false;
 
-            if (c.Id == idSelecionado)
-            {
-                registros[i] = null;
-                return true;
-            }
-        }
+        registros.Remove(registroSelecionado);
 
-        return false;
+        return true;
     }
 
     public EntidadeBase? SelecionarPorId(string idSelecionado)
     {
-        EntidadeBase? entidadeSelecionada = null;
-
-        for (int i = 0; i < registros.Length; i++)
+        foreach (EntidadeBase registro in registros)
         {
-            EntidadeBase? c = registros[i];
-
-            if (c == null)
-                continue;
-
-            if (c.Id == idSelecionado)
-            {
-                entidadeSelecionada = c;
-                break;
-            }
+            if (registro.Id == idSelecionado)
+                return registro;
         }
 
-        return entidadeSelecionada;
+        return null;
     }
 
-    public EntidadeBase?[] SelecionarTodos()
+    public ArrayList SelecionarTodos()
     {
         return registros;
     }
