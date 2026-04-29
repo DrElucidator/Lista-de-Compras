@@ -1,11 +1,10 @@
-using System.Collections;
 using ListaDeCompras.ConsoleApp.Compartilhado;
 
 namespace ListaDeCompras.ConsoleApp.ModuloCategoria;
 
-public class TelaCategoria : TelaBase
+public class TelaCategoria : TelaBase<Categoria>, ITelaMenu, ITelaCrud
 {
-    public TelaCategoria(RepositorioBase repositorio) : base("Categoria", repositorio)
+    public TelaCategoria(RepositorioCategoria repositorio) : base("Categoria", repositorio)
     {
     }
 
@@ -14,8 +13,7 @@ public class TelaCategoria : TelaBase
         if (deveExibirCabecalho)
             ExibirCabecalho("Visualização de Categorias");
 
-
-        ArrayList categorias = repositorio.SelecionarTodos();
+        List<Categoria> categorias = repositorio.SelecionarTodos();
 
         if (categorias.Count == 0)
         {
@@ -62,7 +60,7 @@ public class TelaCategoria : TelaBase
         }
     }
 
-    protected override EntidadeBase ObterDadosCadastrais()
+    protected override Categoria ObterDadosCadastrais()
     {
         Console.Write("Digite o nome da categoria: ");
         string nome = Console.ReadLine() ?? string.Empty;
@@ -78,7 +76,7 @@ public class TelaCategoria : TelaBase
         Console.Write("Digite a cor da categoria: ");
         string cor = Console.ReadLine() ?? string.Empty;
 
-        string corPorExtenso = string.Empty;
+        string corPorExtenso;
 
         if (cor == "1")
             corPorExtenso = "Vermelho";

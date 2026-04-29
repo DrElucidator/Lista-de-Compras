@@ -5,7 +5,7 @@ namespace ListaDeCompras.ConsoleApp.Utilidades;
 
 public class TelaPrincipal
 {
-    private RepositorioCategoria repositorioCategoria = new RepositorioCategoria();
+    private readonly RepositorioCategoria repositorioCategoria = new RepositorioCategoria();
 
     public TelaPrincipal()
     {
@@ -13,7 +13,7 @@ public class TelaPrincipal
         repositorioCategoria.Cadastrar(categoria);
     }
 
-    public ITela? ApresentarMenuOpcoesPrincipal()
+    public ITelaMenu? ApresentarMenuOpcoesPrincipal()
     {
         Console.Clear();
         Console.WriteLine("---------------------------------");

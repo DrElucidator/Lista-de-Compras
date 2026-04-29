@@ -5,7 +5,7 @@ TelaPrincipal telaPrincipal = new TelaPrincipal();
 
 while (true)
 {
-    ITela? telaSelecionada = telaPrincipal.ApresentarMenuOpcoesPrincipal();
+    ITelaMenu? telaSelecionada = telaPrincipal.ApresentarMenuOpcoesPrincipal();
 
     if (telaSelecionada == null)
     {
@@ -17,19 +17,25 @@ while (true)
     {
         string? opcaoSubMenu = telaSelecionada.ObterOpcaoMenu();
 
-        if (telaSelecionada is TelaBase telaBase)
+        if (opcaoSubMenu == "S")
+        {
+            Console.Clear();
+            break;
+        }
+
+        if (telaSelecionada is ITelaCrud telaCrud)
         {
             if (opcaoSubMenu == "1")
-                telaBase.Cadastrar();
+                telaCrud.Cadastrar();
 
             else if (opcaoSubMenu == "2")
-                telaBase.Editar();
+                telaCrud.Editar();
 
             else if (opcaoSubMenu == "3")
-                telaBase.Excluir();
+                telaCrud.Excluir();
 
             else if (opcaoSubMenu == "4")
-                telaBase.VisualizarTodos(deveExibirCabecalho: true);
+                telaCrud.VisualizarTodos(deveExibirCabecalho: true);
         }
     }
 }
