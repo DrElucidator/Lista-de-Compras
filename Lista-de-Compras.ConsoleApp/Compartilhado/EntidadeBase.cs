@@ -1,19 +1,19 @@
 using System.Security.Cryptography;
 
-namespace ListaDeCompras.ConsoleApp.Compartilhado;
-
-public abstract class EntidadeBase : object
+namespace ListaDeCompras.ConsoleApp.Compartilhado
 {
-    public string Id { get; private set; } = string.Empty;
-
-    public EntidadeBase()
+    public abstract class EntidadeBase
     {
-        Id = Convert
-                .ToHexString(RandomNumberGenerator.GetBytes(4))
-                .ToLower()
-                .Substring(0, 5);
-    }
+        public string Id { get; private set; } = string.Empty;
 
-    public abstract string[] Validar();
-    public abstract void AtualizarDados(EntidadeBase entidadeAtualizada);
+        public EntidadeBase()
+        {
+            Id = Convert
+                    .ToHexString(RandomNumberGenerator.GetBytes(4))
+                    .ToUpper()
+                    .Substring(0, 5);
+        }
+
+        public abstract void AtualizarDados(EntidadeBase entidadeAtualizada);
+    }
 }

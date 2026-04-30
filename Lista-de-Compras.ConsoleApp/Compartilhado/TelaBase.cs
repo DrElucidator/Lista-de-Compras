@@ -1,11 +1,15 @@
+using System.Net;
+using ListaDeCompras.ConsoleApp.Compartilhado.Validacao;
+using ListaDeCompras.ConsoleApp.ModuloCategoria;
+
 namespace ListaDeCompras.ConsoleApp.Compartilhado;
 
-public abstract class TelaBase : ITela
+public abstract class TelaBase<T> : ITela where T : EntidadeBase
 {
     public string nomeEntidade = string.Empty;
-    protected RepositorioBase repositorio;
+    protected RepositorioBase<T> repositorio;
 
-    protected TelaBase(string nomeEntidade, RepositorioBase repositorio)
+    protected TelaBase(string nomeEntidade, RepositorioBase<T> repositorio)
     {
         this.nomeEntidade = nomeEntidade;
         this.repositorio = repositorio;
@@ -16,164 +20,171 @@ public abstract class TelaBase : ITela
         string nomeMinusculo = nomeEntidade.ToLower();
 
         Console.Clear();
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine($"Gestão de {nomeEntidade}");
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine($"1 - Cadastrar {nomeMinusculo}");
-        Console.WriteLine($"2 - Editar {nomeMinusculo}");
-        Console.WriteLine($"3 - Excluir {nomeMinusculo}");
-        Console.WriteLine($"4 - Visualizar {nomeMinusculo}s");
-        Console.WriteLine("S - Voltar para o início");
-        Console.WriteLine("---------------------------------");
+        WriteLine("---------------------------------");
+        WriteLine($"Gestão de {nomeEntidade}");
+        WriteLine("---------------------------------");
+        WriteLine($"1 - Cadastrar {nomeMinusculo}");
+        WriteLine($"2 - Editar {nomeMinusculo}");
+        WriteLine($"3 - Excluir {nomeMinusculo}");
+        WriteLine($"4 - Visualizar {nomeMinusculo}s");
+        WriteLine("S - Voltar para o início");
+        WriteLine("---------------------------------");
         Console.Write("> ");
-        string? opcaoMenu = Console.ReadLine()?.ToUpper();
-
-        return opcaoMenu;
+        return Console.ReadLine()?.ToUpper();
     }
 
     public void Cadastrar()
     {
         ExibirCabecalho($"Cadastro de {nomeEntidade}");
 
-        EntidadeBase novaEntidade = ObterDadosCadastrais();
+        T novaEntidade;
 
-        string[] erros = novaEntidade.Validar();
-
-        if (erros.Length > 0)
+        do
         {
-            Console.WriteLine("---------------------------------");
+            novaEntidade = ObterDadosCadastrais();
 
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            for (int i = 0; i < erros.Length; i++)
+            if (!ValidarEntidade(novaEntidade))
             {
-                string erro = erros[i];
-
-                Console.WriteLine(erro);
+                Validar.MensagemContinuar();
+                continue;
             }
 
-            Console.ResetColor();
-            Console.WriteLine("---------------------------------");
-            Console.Write("Digite ENTER para continuar...");
-            Console.ReadLine();
-
-            Cadastrar();
-            return;
-        }
+            break;
+        } while (true);
 
         repositorio.Cadastrar(novaEntidade);
 
-        ExibirMensagem($"O registro \"{novaEntidade.Id}\" foi cadastrado com sucesso!");
+        Validar.MensagemContinuar();
     }
 
     public void Editar()
     {
         ExibirCabecalho($"Edição de {nomeEntidade}");
-
         VisualizarTodos(deveExibirCabecalho: false);
 
-        Console.WriteLine("---------------------------------");
+        WriteLine("---------------------------------");
 
         string? idSelecionado;
 
         do
         {
             Console.Write("Digite o ID do registro que deseja editar: ");
-            idSelecionado = Console.ReadLine();
+            idSelecionado = Console.ReadLine()?.ToUpper();
 
-            if (!string.IsNullOrWhiteSpace(idSelecionado) && idSelecionado.Length == 7)
+            if (string.IsNullOrWhiteSpace(idSelecionado))
+            {
+                Validar.Aviso("Operação cancelada.", nomeEntidade);
+                Validar.MensagemContinuar();
+                return;
+            }
+
+            if (Validar.IdValido(idSelecionado, repositorio.SelecionarTodos(), nomeEntidade))
                 break;
         } while (true);
 
-        Console.WriteLine("---------------------------------");
+        WriteLine("---------------------------------");
 
-        EntidadeBase novaEntidade = ObterDadosCadastrais();
+        var parametroAtual = repositorio.SelecionarPorId(idSelecionado!);
 
-        string[] erros = novaEntidade.Validar();
-
-        if (erros.Length > 0)
+        T novaEntidade;
+   
+        do
         {
-            Console.WriteLine("---------------------------------");
+            novaEntidade = ObterDadosEdicao(parametroAtual!);
 
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            for (int i = 0; i < erros.Length; i++)
+            if (!ValidarEntidade(novaEntidade))
             {
-                string erro = erros[i];
-
-                Console.WriteLine(erro);
+                Validar.MensagemContinuar();
+                continue;
             }
 
-            Console.ResetColor();
-            Console.WriteLine("---------------------------------");
-            Console.Write("Digite ENTER para continuar...");
-            Console.ReadLine();
+            break;
+        } while (true);
 
-            Editar();
-            return;
-        }
-
-        bool conseguiuEditar = repositorio.Editar(idSelecionado, novaEntidade);
+        bool conseguiuEditar = repositorio.Editar(idSelecionado!, novaEntidade);
 
         if (!conseguiuEditar)
-        {
-            ExibirMensagem("Não foi possível encontrar o registro requisitado.");
             return;
-        }
 
-        ExibirMensagem($"O registro \"{idSelecionado}\" foi editado com sucesso.");
+        Validar.MensagemContinuar();
     }
 
     public void Excluir()
     {
-        ExibirCabecalho("Exclusão de Caixa");
-
+        ExibirCabecalho($"Exclusão de {nomeEntidade}");
         VisualizarTodos(deveExibirCabecalho: false);
 
-        Console.WriteLine("---------------------------------");
+        WriteLine("---------------------------------");
 
         string? idSelecionado;
 
         do
         {
             Console.Write("Digite o ID do registro que deseja excluir: ");
-            idSelecionado = Console.ReadLine();
+            idSelecionado = Console.ReadLine()?.ToUpper();
 
-            if (!string.IsNullOrWhiteSpace(idSelecionado) && idSelecionado.Length == 7)
+            if (string.IsNullOrWhiteSpace(idSelecionado))
+            {
+                Validar.Aviso("Operação cancelada.", nomeEntidade);
+                Validar.MensagemContinuar();
+                return;
+            }
+
+            if (Validar.IdValido(idSelecionado, repositorio.SelecionarTodos(), nomeEntidade))
                 break;
         } while (true);
 
-        bool conseguiuExcluir = repositorio.Excluir(idSelecionado);
+        bool conseguiuExcluir = repositorio.Excluir(idSelecionado!);
 
         if (!conseguiuExcluir)
         {
-            ExibirMensagem("Não foi possível encontrar o registro requisitado.");
+            Validar.Erro("Não foi possível excluir o registro requisitado.", nomeEntidade);
             return;
         }
 
-        ExibirMensagem($"O registro \"{idSelecionado}\" foi excluído com sucesso.");
+        Validar.MensagemContinuar();
     }
 
     public abstract void VisualizarTodos(bool deveExibirCabecalho);
 
+    public static void WriteLine(string texto, ConsoleColor cor = ConsoleColor.Gray)
+    {
+        Console.ForegroundColor = cor;
+        Console.WriteLine(texto);
+        Console.ResetColor();
+    }
+
+    public static void Write(string texto, ConsoleColor cor = ConsoleColor.Gray)
+    {
+        Console.ForegroundColor = cor;
+        Console.Write(texto);
+        Console.ResetColor();
+    }
+
+    public static void ExibirTextoColorido(string texto, string cor)
+    {
+        if (Enum.TryParse<ConsoleColor>(cor, true, out var corConsole))
+            Console.ForegroundColor = corConsole;
+
+        else
+            Console.ResetColor();
+
+        Console.WriteLine(texto);
+        Console.ResetColor();
+    }
+
     protected void ExibirCabecalho(string titulo)
     {
         Console.Clear();
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine($"Gestão de {nomeEntidade}");
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine(titulo);
-        Console.WriteLine("---------------------------------");
+        WriteLine("---------------------------------");
+        WriteLine($"Gestão de {nomeEntidade}");
+        WriteLine("---------------------------------");
+        WriteLine(titulo);
+        WriteLine("---------------------------------");
     }
 
-    protected void ExibirMensagem(string mensagem)
-    {
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine(mensagem);
-        Console.WriteLine("---------------------------------");
-        Console.Write("Digite ENTER para continuar...");
-        Console.ReadLine();
-    }
+    protected abstract T ObterDadosCadastrais();
+    protected abstract T ObterDadosEdicao(T Atual);
 
-    protected abstract EntidadeBase ObterDadosCadastrais();
+    protected virtual bool ValidarEntidade(T entidade) => true;
 }

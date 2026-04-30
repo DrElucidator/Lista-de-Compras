@@ -1,4 +1,4 @@
-﻿﻿﻿using ListaDeCompras.ConsoleApp.Compartilhado;
+﻿﻿using ListaDeCompras.ConsoleApp.Compartilhado;
 using ListaDeCompras.ConsoleApp.Utilidades;
 
 TelaPrincipal telaPrincipal = new TelaPrincipal();
@@ -17,19 +17,22 @@ while (true)
     {
         string? opcaoSubMenu = telaSelecionada.ObterOpcaoMenu();
 
-        if (telaSelecionada is TelaBase telaBase)
+        if (opcaoSubMenu == "S")
         {
-            if (opcaoSubMenu == "1")
-                telaBase.Cadastrar();
-
-            else if (opcaoSubMenu == "2")
-                telaBase.Editar();
-
-            else if (opcaoSubMenu == "3")
-                telaBase.Excluir();
-
-            else if (opcaoSubMenu == "4")
-                telaBase.VisualizarTodos(deveExibirCabecalho: true);
+            Console.Clear();
+            break;
         }
+
+        if (opcaoSubMenu == "1")
+            telaSelecionada.Cadastrar();
+
+        else if (opcaoSubMenu == "2")
+            telaSelecionada.Editar();
+
+        else if (opcaoSubMenu == "3")
+            telaSelecionada.Excluir();
+
+        else if (opcaoSubMenu == "4")
+            telaSelecionada.VisualizarTodos(deveExibirCabecalho: true);
     }
 }

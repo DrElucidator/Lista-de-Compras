@@ -9,7 +9,7 @@ public class TelaPrincipal
 
     public TelaPrincipal()
     {
-        Categoria categoria = new Categoria("Compras do Mês", "Vermelho");
+        Categoria categoria = new Categoria("Compras do Mês", "Yellow");
         repositorioCategoria.Cadastrar(categoria);
     }
 

@@ -1,94 +1,108 @@
 using System.Collections;
 using ListaDeCompras.ConsoleApp.Compartilhado;
+using ListaDeCompras.ConsoleApp.Compartilhado.Validacao;
 
 namespace ListaDeCompras.ConsoleApp.ModuloCategoria;
 
-public class TelaCategoria : TelaBase
+public class TelaCategoria : TelaBase<Categoria>
 {
-    public TelaCategoria(RepositorioBase repositorio) : base("Categoria", repositorio)
-    {
-    }
-
+    public TelaCategoria(RepositorioBase<Categoria> repositorio) : base("Categoria", repositorio) { }
     public override void VisualizarTodos(bool deveExibirCabecalho)
     {
         if (deveExibirCabecalho)
-            ExibirCabecalho("Visualização de Categorias");
+            ExibirCabecalho($"Visualização de {nomeEntidade}");
 
-
-        ArrayList categorias = repositorio.SelecionarTodos();
+        var categorias = repositorio.SelecionarTodos();
 
         if (categorias.Count == 0)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Não existe nenhum registro.");
-            Console.ResetColor();
-            Console.WriteLine("---------------------------------");
-            Console.Write("Digite ENTER para continuar...");
-            Console.ReadLine();
+            Validar.Aviso("Nenhuma categoria cadastrada.");
             return;
         }
 
-        Console.WriteLine(
-            "{0, -7} | {1, -20} | {2, -10}",
-            "Id", "Nome", "Cor"
-        );
-
-        foreach (Categoria c in categorias)
-        {
-            string corSelecionada = c.Cor;
-
-            if (corSelecionada == "Vermelho")
-                Console.ForegroundColor = ConsoleColor.Red;
-
-            else if (corSelecionada == "Verde")
-                Console.ForegroundColor = ConsoleColor.Green;
-
-            else if (corSelecionada == "Azul")
-                Console.ForegroundColor = ConsoleColor.Blue;
-
-            Console.WriteLine(
-                "{0, -7} | {1, -20} | {2, -10}",
-                c.Id, c.Nome, c.Cor
-            );
-        }
-
-        Console.ResetColor();
+        foreach (var categoria in categorias)
+            ExibirTextoColorido($"{categoria.Id}: {categoria.Nome}", categoria.Cor);
 
         if (deveExibirCabecalho)
-        {
-            Console.WriteLine("---------------------------------");
-            Console.Write("Digite ENTER para continuar...");
-            Console.ReadLine();
-        }
+            Validar.MensagemContinuar();
     }
 
-    protected override EntidadeBase ObterDadosCadastrais()
+    protected override Categoria ObterDadosCadastrais()
     {
-        Console.Write("Digite o nome da categoria: ");
-        string nome = Console.ReadLine() ?? string.Empty;
+        string nome;
+        do
+        {
+            Write("Digite o nome da categoria: ");
+            nome = Console.ReadLine() ?? string.Empty;
 
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine("Selecione uma cor válida para a categoria");
-        Console.WriteLine("---------------------------------");
-        Console.WriteLine("1 - Vermelho");
-        Console.WriteLine("2 - Azul");
-        Console.WriteLine("3 - Verde");
-        Console.WriteLine("4 - Branco (Padrão)");
-        Console.WriteLine("---------------------------------");
-        Console.Write("Digite a cor da categoria: ");
-        string cor = Console.ReadLine() ?? string.Empty;
+            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 3, 50))
+                break;
 
-        string corPorExtenso = string.Empty;
+        } while (true);
 
-        if (cor == "1")
-            corPorExtenso = "Vermelho";
-        else if (cor == "2")
-            corPorExtenso = "Azul";
-        else if (cor == "3")
-            corPorExtenso = "Verde";
-        else
-            corPorExtenso = "Branco";
+        string cor;
+        do
+        {
+            Write("Digite a cor da categoria: ");
+            cor = Console.ReadLine() ?? string.Empty;
 
-        return new Categoria(nome, corPorExtenso);
+            if (string.IsNullOrWhiteSpace(cor))
+                break;
+
+            if (Validar.CorValida(cor, "Cor"))
+                break;
+
+        } while (true);
+
+        return new Categoria(nome, cor);
+    }
+
+    protected override Categoria ObterDadosEdicao(Categoria atual)
+    {
+        string nome;
+        do
+        {
+            Write("Digite o nome da categoria: ");
+            nome = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                nome = atual.Nome;
+                break;
+            }
+
+            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 3, 50))
+                break;
+        } while (true);
+
+        string cor;
+        do
+        {
+            Write("Digite a cor da categoria: ");
+            cor = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(cor))
+            {
+                cor = atual.Cor;
+                break;
+            }
+
+            if (Validar.CorValida(cor, "Cor"))
+                break;
+        } while (true);
+
+        return new Categoria(nome, cor);
+    }
+
+    protected override bool ValidarEntidade(Categoria categoria)
+    {
+        bool valido = true;
+
+        valido &= Validar.CampoObrigatorio(categoria.Nome, "Nome");
+        valido &= Validar.Tamanho(categoria.Nome, "Nome", 3, 50);
+
+        valido &= Validar.CorValida(categoria.Cor, "Cor");
+
+        return valido;
     }
 }
