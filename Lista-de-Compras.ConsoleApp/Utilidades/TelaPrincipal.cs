@@ -1,15 +1,17 @@
 using ListaDeCompras.ConsoleApp.Compartilhado;
 using ListaDeCompras.ConsoleApp.ModuloCategoria;
+using ListaDeCompras.ConsoleApp.ModuloProduto;
 
 namespace ListaDeCompras.ConsoleApp.Utilidades;
 
 public class TelaPrincipal
 {
     private RepositorioCategoria repositorioCategoria = new RepositorioCategoria();
+    private RepositorioProduto repositorioProduto = new RepositorioProduto();
 
     public TelaPrincipal()
     {
-        Categoria categoria = new Categoria("Compras do Mês", "Yellow");
+        Categoria categoria = new Categoria("Compras do Mês", "CYAN");
         repositorioCategoria.Cadastrar(categoria);
     }
 
@@ -29,8 +31,9 @@ public class TelaPrincipal
         string? opcaoMenuPrincipal = Console.ReadLine()?.ToUpper();
 
         if (opcaoMenuPrincipal == "1")
-            return new TelaCategoria(repositorioCategoria);
-
+            return new TelaCategoria(repositorioCategoria, repositorioProduto);
+        if (opcaoMenuPrincipal == "2")
+            return new TelaProduto(repositorioProduto, repositorioCategoria);
         return null;
     }
 }

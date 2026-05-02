@@ -9,7 +9,7 @@ namespace ListaDeCompras.ConsoleApp.Compartilhado
         public EntidadeBase()
         {
             Id = Convert
-                    .ToHexString(RandomNumberGenerator.GetBytes(4))
+                    .ToHexString(RandomNumberGenerator.GetBytes(3))
                     .ToUpper()
                     .Substring(0, 5);
         }

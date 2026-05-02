@@ -1,4 +1,5 @@
 using System.Net;
+using ListaDeCompras.ConsoleApp.Utilidades;
 using ListaDeCompras.ConsoleApp.Compartilhado.Validacao;
 using ListaDeCompras.ConsoleApp.ModuloCategoria;
 
@@ -87,7 +88,7 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         var parametroAtual = repositorio.SelecionarPorId(idSelecionado!);
 
         T novaEntidade;
-   
+
         do
         {
             novaEntidade = ObterDadosEdicao(parametroAtual!);
@@ -134,11 +135,12 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
                 break;
         } while (true);
 
-        bool conseguiuExcluir = repositorio.Excluir(idSelecionado!);
+        bool conseguiuExcluir = repositorio.Excluir(idSelecionado!, ValidarVinculos);
 
         if (!conseguiuExcluir)
         {
             Validar.Erro("Não foi possível excluir o registro requisitado.", nomeEntidade);
+            Validar.MensagemContinuar();
             return;
         }
 
@@ -161,18 +163,6 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         Console.ResetColor();
     }
 
-    public static void ExibirTextoColorido(string texto, string cor)
-    {
-        if (Enum.TryParse<ConsoleColor>(cor, true, out var corConsole))
-            Console.ForegroundColor = corConsole;
-
-        else
-            Console.ResetColor();
-
-        Console.WriteLine(texto);
-        Console.ResetColor();
-    }
-
     protected void ExibirCabecalho(string titulo)
     {
         Console.Clear();
@@ -185,6 +175,6 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
 
     protected abstract T ObterDadosCadastrais();
     protected abstract T ObterDadosEdicao(T Atual);
-
+    protected virtual Func<T, bool>? ValidarVinculos => null;
     protected virtual bool ValidarEntidade(T entidade) => true;
 }
