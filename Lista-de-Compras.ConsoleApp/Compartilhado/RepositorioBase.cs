@@ -53,21 +53,6 @@ public abstract class RepositorioBase<T> where T : EntidadeBase
         return true;
     }
 
-    protected ValidacaoErro? ValidarDuplicado(string valor, string nomeCampo)
-    {
-        var propriedadeNome = typeof(T).GetProperty("Nome");
-        if (propriedadeNome != null)
-        {
-            bool existe = registros.Any(reg =>
-                propriedadeNome.GetValue(reg)?.ToString()!
-                .Equals(valor, StringComparison.OrdinalIgnoreCase) == true);
-
-            if (existe)
-                return new ValidacaoErro(nomeCampo, $"Já existe um registro com o campo \"{nomeCampo}\" igual a \"{valor}\"", "Nome");
-        }
-        return null;
-    }
-
     public virtual T? SelecionarPorId(string idSelecionado) =>
         registros.FirstOrDefault(reg => reg.Id == idSelecionado);
 

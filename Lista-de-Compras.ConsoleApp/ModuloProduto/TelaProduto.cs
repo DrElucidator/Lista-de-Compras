@@ -48,6 +48,12 @@ public class TelaProduto : TelaBase<Produto>
             Console.Write("Digite o ID da categoria do produto: ");
             idCategoria = Console.ReadLine()?.ToUpper() ?? string.Empty;
 
+            if (string.IsNullOrWhiteSpace(idCategoria))
+            {
+                Validar.Aviso("Operação cancelada.", "Produto");
+                return null!;
+            }
+
             if (Validar.IdValido(idCategoria, repositorioCategoria.SelecionarTodos(), "Categoria"))
                 break;
         } while (true);
@@ -58,7 +64,7 @@ public class TelaProduto : TelaBase<Produto>
             Write("Digite o nome do produto: ");
             nome = Console.ReadLine() ?? string.Empty;
 
-            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 3, 50))
+            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 2, 100) && Validar.Duplicado(nome, "Nome", repositorio.SelecionarTodos()))
                 break;
 
         } while (true);
@@ -101,7 +107,7 @@ public class TelaProduto : TelaBase<Produto>
                 break;
             }
 
-            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 2, 50))
+            if (Validar.CampoObrigatorio(nome, "Nome"))
                 break;
         } while (true);
 
@@ -146,6 +152,7 @@ public class TelaProduto : TelaBase<Produto>
 
         valido &= Validar.CampoObrigatorio(produto.Nome, "Nome");
         valido &= Validar.Tamanho(produto.Nome, "Nome", 2, 100);
+        //valido &= Validar.Duplicado(produto.Nome, "Nome", repositorio.SelecionarTodos());
 
         valido &= Validar.CampoObrigatorio(produto.Medida, "Medida");
         valido &= Validar.Tamanho(produto.Medida, "Unidade de Medida", 2, 50);

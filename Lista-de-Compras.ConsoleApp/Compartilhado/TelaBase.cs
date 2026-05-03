@@ -44,6 +44,9 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         {
             novaEntidade = ObterDadosCadastrais();
 
+            if (novaEntidade == null)
+                return;
+        
             if (!ValidarEntidade(novaEntidade))
             {
                 Validar.MensagemContinuar();
@@ -54,8 +57,6 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         } while (true);
 
         repositorio.Cadastrar(novaEntidade);
-
-        Validar.MensagemContinuar();
     }
 
     public void Editar()
@@ -106,8 +107,6 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
 
         if (!conseguiuEditar)
             return;
-
-        Validar.MensagemContinuar();
     }
 
     public void Excluir()
@@ -143,8 +142,6 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
             Validar.MensagemContinuar();
             return;
         }
-
-        Validar.MensagemContinuar();
     }
 
     public abstract void VisualizarTodos(bool deveExibirCabecalho);

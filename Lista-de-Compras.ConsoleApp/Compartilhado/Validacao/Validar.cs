@@ -62,6 +62,26 @@ public static class Validar
         return true;
     }
 
+    public static bool Duplicado<T>(string valor, string nomeCampo, List<T> registros, string idAtual = null, string assunto = "Validação") where T : EntidadeBase
+    {
+        if (string.IsNullOrWhiteSpace(valor))
+        return true;
+        
+        var propriedadeNome = typeof(T).GetProperty("Nome");
+        if (propriedadeNome != null)
+        {
+            bool existe = registros.Any(reg => (idAtual == null || reg.Id != idAtual) &&
+            string.Equals(propriedadeNome.GetValue(reg)?.ToString(), valor, StringComparison.OrdinalIgnoreCase));
+
+            if (existe)
+            {
+                Erro($"Já existe um registro com o campo \"{nomeCampo}\" igual a \"{valor}\".", assunto);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static bool NumeroPositivo(double valor, string nomeCampo, string assunto = "Validação")
     {
         if (valor <= 0)

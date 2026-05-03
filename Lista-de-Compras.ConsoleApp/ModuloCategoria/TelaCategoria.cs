@@ -39,7 +39,14 @@ public class TelaCategoria : TelaBase<Categoria>
             Write("Digite o nome da categoria: ");
             nome = Console.ReadLine() ?? string.Empty;
 
-            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 3, 50))
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                Validar.Aviso("Operação cancelada.", "Categoria");
+                Validar.MensagemContinuar();
+                return null!;
+            }
+
+            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 3, 50) && Validar.Duplicado(nome, "Nome", repositorio.SelecionarTodos()))
                 break;
 
         } while (true);
@@ -105,6 +112,7 @@ public class TelaCategoria : TelaBase<Categoria>
 
         valido &= Validar.CampoObrigatorio(categoria.Nome, "Nome");
         valido &= Validar.Tamanho(categoria.Nome, "Nome", 3, 50);
+        //valido &= Validar.Duplicado(categoria.Nome, "Nome", repositorio.SelecionarTodos(), categoria.Id);
 
         valido &= Validar.CorValida(categoria.Cor, "Cor");
 
