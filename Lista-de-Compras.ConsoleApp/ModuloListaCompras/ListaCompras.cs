@@ -1,8 +1,8 @@
 using ListaDeCompras.ConsoleApp.Compartilhado;
 
-namespace ListaDeCompras.ConsoleApp.ModuloLista;
+namespace ListaDeCompras.ConsoleApp.ModuloListaCompras;
 
-public class ListaDeCompras : EntidadeBase
+public class ListaCompras : EntidadeBase
 {
     public string Nome { get; private set; }
     public DateTime DataCriacao { get; private set; }
@@ -10,7 +10,7 @@ public class ListaDeCompras : EntidadeBase
     public int TotalItens { get; set; }
     public double TotalGastoEstimado { get; set; }
 
-    public ListaDeCompras(string nome)
+    public ListaCompras(string nome)
     {
         Nome = nome;
         DataCriacao = DateTime.Now;
@@ -21,7 +21,7 @@ public class ListaDeCompras : EntidadeBase
 
     public override void AtualizarDados(EntidadeBase entidadeAtualizada)
     {
-        var listaAtualizada = (ListaDeCompras)entidadeAtualizada;
+        var listaAtualizada = (ListaCompras)entidadeAtualizada;
 
         Nome = listaAtualizada.Nome;
         Status = listaAtualizada.Status;

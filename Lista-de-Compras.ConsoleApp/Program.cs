@@ -23,6 +23,9 @@ while (true)
             break;
         }
 
+        if (string.IsNullOrWhiteSpace(opcaoSubMenu))
+            return;
+
         if (opcaoSubMenu == "1")
             telaSelecionada.Cadastrar();
 

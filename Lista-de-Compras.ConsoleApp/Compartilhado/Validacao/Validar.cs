@@ -65,8 +65,8 @@ public static class Validar
     public static bool Duplicado<T>(string valor, string nomeCampo, List<T> registros, string idAtual = null, string assunto = "Validação") where T : EntidadeBase
     {
         if (string.IsNullOrWhiteSpace(valor))
-        return true;
-        
+            return true;
+
         var propriedadeNome = typeof(T).GetProperty("Nome");
         if (propriedadeNome != null)
         {
@@ -147,5 +147,160 @@ public static class Validar
         }
 
         return true;
+    }
+
+    public static string LerCampoObrigatorio<T>(string mensagem, string nomeCampo, int min, int max, List<T>? registros = null) where T : EntidadeBase
+    {
+        string valor;
+        do
+        {
+            Console.Write(mensagem);
+            valor = Console.ReadLine() ?? string.Empty;
+
+            if (CampoObrigatorio(valor, nomeCampo) && Tamanho(valor, nomeCampo, min, max))
+            {
+                if (registros != null && !Duplicado(valor, nomeCampo, registros))
+                    continue;
+                break;
+            }
+        } while (true);
+
+        return valor;
+    }
+
+    public static string LerCampoOpcional(string mensagem, string valorAtual, string nomeCampo, int min, int max)
+    {
+        Console.Write(mensagem);
+        string valor = Console.ReadLine() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(valor))
+            return valorAtual;
+
+        if (CampoObrigatorio(valor, nomeCampo) && Tamanho(valor, nomeCampo, min, max))
+            return valor;
+
+        return valorAtual;
+    }
+
+    public static string LerId<T>(string mensagem, List<T> lista, string assunto) where T : EntidadeBase
+    {
+        string id;
+        do
+        {
+            Console.Write(mensagem);
+            id = Console.ReadLine()?.ToUpper() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                Aviso("Operação cancelada.", assunto);
+                MensagemContinuar();
+                return string.Empty;
+            }
+
+            if (IdValido(id, lista, assunto))
+                break;
+        } while (true);
+
+        return id;
+    }
+
+    public static int LerQuantidade(string mensagem, string nomeCampo)
+    {
+        int quantidade;
+        do
+        {
+            Console.Write(mensagem);
+            string? entrada = Console.ReadLine();
+
+            if (int.TryParse(entrada, out quantidade) && quantidade > 0)
+                break;
+
+            Erro($"O campo \"{nomeCampo}\" deve ser um número positivo.", "Validação");
+        } while (true);
+
+        return quantidade;
+    }
+
+    public static string LerCor(string mensagem, string nomeCampo)
+    {
+        string cor;
+        do
+        {
+            Console.Write(mensagem);
+            cor = Console.ReadLine() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(cor))
+                return cor;
+
+            if (CorValida(cor, nomeCampo))
+                break;
+        } while (true);
+
+        return cor;
+    }
+
+    public static string LerCorOpcional(string mensagem, string corAtual)
+    {
+        Console.Write(mensagem);
+        string cor = Console.ReadLine() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(cor))
+            return corAtual;
+
+        if (CorValida(cor, "Cor"))
+            return cor;
+
+        return corAtual;
+    }
+
+    public static double LerPreco(string mensagem)
+    {
+        double preco;
+        do
+        {
+            Console.Write(mensagem);
+            string? entrada = Console.ReadLine();
+
+            if (PrecoValido(entrada, out preco) && NumeroPositivo(preco, "Preço"))
+                break;
+        } while (true);
+
+        return preco;
+    }
+
+    public static double LerPrecoOpcional(string mensagem, double precoAtual)
+    {
+        Console.Write(mensagem);
+        string? entrada = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(entrada))
+            return precoAtual;
+
+        double preco;
+        if (PrecoValido(entrada, out preco) && NumeroPositivo(preco, "Preço"))
+            return preco;
+
+        return precoAtual;
+    }
+
+    public static string LerStatus(string mensagem, string statusAtual)
+    {
+        string status;
+        do
+        {
+            Console.WriteLine(mensagem);
+            Console.Write("> ");
+            string? opcao = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(opcao))
+                return statusAtual;
+
+            if (opcao == "1")
+                return "Aberta";
+            else if (opcao == "2")
+                return "Concluída";
+
+            Erro("Opção inválida. Digite 1 ou 2.", "Lista");
+        } while (true);
     }
 }

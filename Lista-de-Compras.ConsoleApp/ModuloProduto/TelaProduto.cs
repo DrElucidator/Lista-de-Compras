@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using ListaDeCompras.ConsoleApp.ModuloCategoria;
 using ListaDeCompras.ConsoleApp.Compartilhado;
 using ListaDeCompras.ConsoleApp.Compartilhado.Validacao;
-using System.Data.Common;
+using ListaDeCompras.ConsoleApp.ModuloCategoria;
 using ListaDeCompras.ConsoleApp.Utilidades;
 
 namespace ListaDeCompras.ConsoleApp.ModuloProduto;
@@ -12,7 +8,12 @@ namespace ListaDeCompras.ConsoleApp.ModuloProduto;
 public class TelaProduto : TelaBase<Produto>
 {
     private readonly RepositorioBase<Categoria> repositorioCategoria;
-    public TelaProduto(RepositorioBase<Produto> repositorioProduto, RepositorioBase<Categoria> repositorioCategoria) : base("Produto", repositorioProduto) { this.repositorioCategoria = repositorioCategoria; }
+
+    public TelaProduto(RepositorioBase<Produto> repositorioProduto, RepositorioBase<Categoria> repositorioCategoria) : base("Produto", repositorioProduto)
+    {
+        this.repositorioCategoria = repositorioCategoria;
+    }
+
     public override void VisualizarTodos(bool deveExibirCabecalho)
     {
         if (deveExibirCabecalho)
@@ -42,106 +43,22 @@ public class TelaProduto : TelaBase<Produto>
         var telaCategoria = new TelaCategoria(repositorioCategoria, repositorio);
         telaCategoria.VisualizarTodos(false);
 
-        string idCategoria;
-        do
-        {
-            Console.Write("Digite o ID da categoria do produto: ");
-            idCategoria = Console.ReadLine()?.ToUpper() ?? string.Empty;
+        string idCategoria = Validar.LerId("Digite o ID da categoria do produto: ", repositorioCategoria.SelecionarTodos(), "Categoria");
 
-            if (string.IsNullOrWhiteSpace(idCategoria))
-            {
-                Validar.Aviso("Operação cancelada.", "Produto");
-                return null!;
-            }
+        string nome = Validar.LerCampoObrigatorio("Digite o nome do produto: ", "Nome", 2, 100, repositorio.SelecionarTodos());
 
-            if (Validar.IdValido(idCategoria, repositorioCategoria.SelecionarTodos(), "Categoria"))
-                break;
-        } while (true);
+        string medida = Validar.LerCampoObrigatorio("Digite a unidade de medida do produto: ", "Medida", 2, 50, repositorio.SelecionarTodos());
 
-        string nome;
-        do
-        {
-            Write("Digite o nome do produto: ");
-            nome = Console.ReadLine() ?? string.Empty;
-
-            if (Validar.CampoObrigatorio(nome, "Nome") && Validar.Tamanho(nome, "Nome", 2, 100) && Validar.Duplicado(nome, "Nome", repositorio.SelecionarTodos()))
-                break;
-
-        } while (true);
-
-        string medida;
-        do
-        {
-            Write("Digite a unidade de medida do produto: ");
-            medida = Console.ReadLine()?.ToUpper() ?? string.Empty;
-
-            if (Validar.CampoObrigatorio(medida, "Medida") && Validar.Tamanho(medida, "Medida", 2, 50))
-                break;
-
-        } while (true);
-
-        double preco;
-        do
-        {
-            Write("Digite o preço do produto: ");
-            string? precoInformado = Console.ReadLine();
-
-            if (Validar.PrecoValido(precoInformado, out preco) && Validar.NumeroPositivo(preco, "Preço", "Preço"))
-                break;
-        } while (true);
+        double preco = Validar.LerPreco("Digite o preço do produto: ");
 
         return new Produto(nome, medida, preco, idCategoria);
     }
 
     protected override Produto ObterDadosEdicao(Produto atual)
     {
-        string nome;
-        do
-        {
-            Write("Digite o nome do produto: ");
-            nome = Console.ReadLine() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                nome = atual.Nome;
-                break;
-            }
-
-            if (Validar.CampoObrigatorio(nome, "Nome"))
-                break;
-        } while (true);
-
-        string medida;
-        do
-        {
-            Write("Digite a unidade de medida do produto: ");
-            medida = Console.ReadLine() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(medida))
-            {
-                medida = atual.Medida;
-                break;
-            }
-
-            if (Validar.CampoObrigatorio(medida, "Medida") && Validar.Tamanho(medida, "Medida", 2, 50))
-                break;
-        } while (true);
-
-        double preco;
-        do
-        {
-            Write("Digite o preço do produto: ");
-            string? precoInformado = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(precoInformado))
-            {
-                preco = atual.Preco;
-                break;
-            }
-
-            if (Validar.PrecoValido(precoInformado, out preco) && Validar.NumeroPositivo(preco, "Preço", "Preço"))
-                break;
-        } while (true);
+        string nome = Validar.LerCampoOpcional("Digite o nome do produto: ", atual.Nome, "Nome", 2, 100);
+        string medida = Validar.LerCampoOpcional("Digite a unidade de medida do produto: ", atual.Medida, "Medida", 2, 50);
+        double preco = Validar.LerPrecoOpcional("Digite o preço do produto: ", atual.Preco);
 
         return new Produto(nome, medida, preco, atual.IdCategoria);
     }
@@ -152,13 +69,9 @@ public class TelaProduto : TelaBase<Produto>
 
         valido &= Validar.CampoObrigatorio(produto.Nome, "Nome");
         valido &= Validar.Tamanho(produto.Nome, "Nome", 2, 100);
-        //valido &= Validar.Duplicado(produto.Nome, "Nome", repositorio.SelecionarTodos());
-
         valido &= Validar.CampoObrigatorio(produto.Medida, "Medida");
         valido &= Validar.Tamanho(produto.Medida, "Unidade de Medida", 2, 50);
-
         valido &= Validar.NumeroPositivo(produto.Preco, "Preço", "Preço");
-
         valido &= Validar.IdValido(produto.IdCategoria, repositorioCategoria.SelecionarTodos(), "Categoria");
 
         return valido;

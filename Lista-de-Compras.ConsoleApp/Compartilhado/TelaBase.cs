@@ -21,15 +21,17 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         string nomeMinusculo = nomeEntidade.ToLower();
 
         Console.Clear();
-        WriteLine("---------------------------------");
-        WriteLine($"Gestão de {nomeEntidade}");
-        WriteLine("---------------------------------");
-        WriteLine($"1 - Cadastrar {nomeMinusculo}");
-        WriteLine($"2 - Editar {nomeMinusculo}");
-        WriteLine($"3 - Excluir {nomeMinusculo}");
-        WriteLine($"4 - Visualizar {nomeMinusculo}s");
-        WriteLine("S - Voltar para o início");
-        WriteLine("---------------------------------");
+        CustomText.TextoColorido(
+                                ("---------------------------------\n", null),
+                                ($"Gestão de {nomeEntidade}\n", null),
+                                ("---------------------------------\n", null),
+                                ($"1 - Cadastro de {nomeMinusculo}\n", null),
+                                ($"2 - Edição de {nomeMinusculo}\n", null),
+                                ($"3 - Exclusão de {nomeMinusculo}\n", null),
+                                ($"4 - Visualização de {nomeMinusculo}\n", null),
+                                ("S - Voltar para o início\n", null),
+                                ("---------------------------------", null)
+                                );
         Console.Write("> ");
         return Console.ReadLine()?.ToUpper();
     }
@@ -64,7 +66,7 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         ExibirCabecalho($"Edição de {nomeEntidade}");
         VisualizarTodos(deveExibirCabecalho: false);
 
-        WriteLine("---------------------------------");
+        Console.WriteLine("---------------------------------");
 
         string? idSelecionado;
 
@@ -84,7 +86,7 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
                 break;
         } while (true);
 
-        WriteLine("---------------------------------");
+        Console.WriteLine("---------------------------------");
 
         var parametroAtual = repositorio.SelecionarPorId(idSelecionado!);
 
@@ -114,7 +116,7 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
         ExibirCabecalho($"Exclusão de {nomeEntidade}");
         VisualizarTodos(deveExibirCabecalho: false);
 
-        WriteLine("---------------------------------");
+        Console.WriteLine("---------------------------------");
 
         string? idSelecionado;
 
@@ -146,28 +148,16 @@ public abstract class TelaBase<T> : ITela where T : EntidadeBase
 
     public abstract void VisualizarTodos(bool deveExibirCabecalho);
 
-    public static void WriteLine(string texto, ConsoleColor cor = ConsoleColor.Gray)
-    {
-        Console.ForegroundColor = cor;
-        Console.WriteLine(texto);
-        Console.ResetColor();
-    }
-
-    public static void Write(string texto, ConsoleColor cor = ConsoleColor.Gray)
-    {
-        Console.ForegroundColor = cor;
-        Console.Write(texto);
-        Console.ResetColor();
-    }
-
     protected void ExibirCabecalho(string titulo)
     {
         Console.Clear();
-        WriteLine("---------------------------------");
-        WriteLine($"Gestão de {nomeEntidade}");
-        WriteLine("---------------------------------");
-        WriteLine(titulo);
-        WriteLine("---------------------------------");
+        CustomText.TextoColorido(
+                                ("---------------------------------\n", null),
+                                ($"Gestão de {nomeEntidade}\n", null),
+                                ("---------------------------------\n", null),
+                                ($"{titulo}\n", null),
+                                ("---------------------------------", null)
+                                );
     }
 
     protected abstract T ObterDadosCadastrais();

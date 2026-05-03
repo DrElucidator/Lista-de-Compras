@@ -1,6 +1,6 @@
 using ListaDeCompras.ConsoleApp.Compartilhado;
 
-namespace ListaDeCompras.ConsoleApp.ModuloCategoria;
+namespace ListaDeCompras.ConsoleApp.ModuloProduto;
 
 public class Produto : EntidadeBase
 {
